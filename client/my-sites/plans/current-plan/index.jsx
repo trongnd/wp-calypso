@@ -130,17 +130,19 @@ class CurrentPlan extends Component {
 					/>
 				) }
 
-				<CurrentPlanHeader
-					selectedSite={ selectedSite }
-					isPlaceholder={ isLoading }
-					title={ title }
-					tagLine={ tagLine }
-					currentPlanSlug={ currentPlanSlug }
-					currentPlan={ currentPlan }
-					isExpiring={ isExpiring }
-					isAutomatedTransfer={ isAutomatedTransfer }
-					includePlansLink={ currentPlan && isFreeJetpackPlan( currentPlan ) }
-				/>
+				{ false && (
+					<CurrentPlanHeader
+						selectedSite={ selectedSite }
+						isPlaceholder={ isLoading }
+						title={ title }
+						tagLine={ tagLine }
+						currentPlanSlug={ currentPlanSlug }
+						currentPlan={ currentPlan }
+						isExpiring={ isExpiring }
+						isAutomatedTransfer={ isAutomatedTransfer }
+						includePlansLink={ currentPlan && isFreeJetpackPlan( currentPlan ) }
+					/>
+				) }
 				{ isEnabled( 'jetpack/checklist' ) &&
 					isJetpack &&
 					! isAutomatedTransfer && (
