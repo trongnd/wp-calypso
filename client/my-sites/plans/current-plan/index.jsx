@@ -109,7 +109,9 @@ class CurrentPlan extends Component {
 				<QuerySitePlans siteId={ selectedSiteId } />
 				{ shouldQuerySiteDomains && <QuerySiteDomains siteId={ selectedSiteId } /> }
 
-				<PlansNavigation path={ path } selectedSite={ selectedSite } />
+				{ false /* @TODO Disabled. Errors fixed by #26780. */ && (
+					<PlansNavigation path={ path } selectedSite={ selectedSite } />
+				) }
 
 				{ showDomainWarnings && (
 					<DomainWarnings
