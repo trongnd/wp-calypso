@@ -18,6 +18,7 @@ import {
 	flatten,
 	forEach,
 	intersection,
+	partition,
 	snakeCase,
 	split,
 } from 'lodash';
@@ -90,6 +91,11 @@ const getAssets = ( () => {
 	};
 } )();
 
+const groupAssetsByType = assets => {
+	const [ css, js ] = partition( assets, file => /\.css$/.test( file ) );
+	return { css, js };
+};
+
 const getFilesForChunk = chunkName => {
 	const assets = getAssets();
 
@@ -115,7 +121,14 @@ const getFilesForChunk = chunkName => {
 		flatten( chunk.siblings.map( sibling => getChunkById( sibling ).files ) )
 	);
 
-	return allTheFiles;
+	return groupAssetsByType( allTheFiles );
+};
+
+const getFilesForEntrypoint = () => {
+	const entrypointAssets = getAssets().entrypoints.build.assets.filter(
+		asset => ! asset.startsWith( 'manifest' )
+	);
+	return groupAssetsByType( entrypointAssets );
 };
 
 /**
@@ -233,9 +246,7 @@ function getDefaultContext( request ) {
 		isDebug,
 		badge: false,
 		lang,
-		entrypoint: getAssets().entrypoints.build.assets.filter(
-			asset => ! asset.startsWith( 'manifest' )
-		),
+		entrypoint: getFilesForEntrypoint(),
 		manifest: getAssets().manifests.manifest,
 		faviconURL: '//s1.wp.com/i/favicon.ico',
 		isFluidWidth: !! config.isEnabled( 'fluid-width' ),
@@ -641,7 +652,7 @@ module.exports = function() {
 					if ( config.isEnabled( 'code-splitting' ) ) {
 						req.context.chunkFiles = getFilesForChunk( section.name );
 					} else {
-						req.context.chunkFiles = [];
+						req.context.chunkFiles = { css: [], js: [] };
 					}
 
 					if ( section.secondary && req.context ) {
