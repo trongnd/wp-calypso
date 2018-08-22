@@ -5,7 +5,7 @@
 import React, { Component } from 'react';
 import { localize } from 'i18n-calypso';
 import { connect } from 'react-redux';
-import { debounce, flow, get } from 'lodash';
+import { debounce, defer, flow, get } from 'lodash';
 import debugFactory from 'debug';
 
 /**
@@ -15,7 +15,7 @@ import Button from 'components/button';
 import ButtonGroup from 'components/button-group';
 import StepWrapper from 'signup/step-wrapper';
 import SignupActions from 'lib/signup/actions';
-import FormTextInputWithAction from 'components/forms/form-text-input-with-action';
+import FormTextInput from 'components/forms/form-text-input';
 import FormInputValidation from 'components/forms/form-input-validation';
 import { setNuxUrlInputValue, setValidationMessage } from 'state/importer-nux/actions';
 import {
@@ -34,24 +34,22 @@ const normalizeUrlForImportSource = url => {
 	return url;
 };
 
+const isValidUrl = ( value = '' ) =>
+	value.match( /^([a-z0-9-_]{1,63}\.)*[a-z0-9-]{1,63}\.[a-z]{2,63}$/i );
+
 class ImportURLStepComponent extends Component {
 	componentDidMount() {
 		const { queryObject } = this.props;
 		const urlFromQueryArg = normalizeUrlForImportSource( get( queryObject, 'url' ) );
 
 		if ( urlFromQueryArg ) {
-			this.setValidationMessage( urlFromQueryArg );
+			this.props.setNuxUrlInputValue( urlFromQueryArg );
+			defer( this.checkValidation );
 		}
 	}
 
-	getValidationMessage() {
-		const { urlInputValue, translate } = this.props;
-
-		if ( ! urlInputValue.match( /^([a-z0-9-_]{1,63}\.)*[a-z0-9-]{1,63}\.[a-z]{2,63}$/i ) ) {
-			return translate( 'Please enter a valid URL.' );
-		}
-
-		return '';
+	getValidationMessage( value ) {
+		return isValidUrl( value ) ? '' : this.props.translate( 'Please enter a valid URL.' );
 	}
 
 	handleAction = importUrl => {
@@ -66,36 +64,55 @@ class ImportURLStepComponent extends Component {
 		this.props.goToNextStep();
 	};
 
-	handleInputChange = value => {
+	handleInputChange = event => {
+		const value = get( event, 'target.value', '' );
+
 		this.props.setNuxUrlInputValue( value );
-		this.debouncedSetValidationMessage( value );
+		this.checkValidation( value );
 	};
 
-	setValidationMessage = () => {
-		const validationMessage = this.getValidationMessage( this.props.urlInputValue );
-		this.props.setValidationMessage( validationMessage );
+	checkValidation( value ) {
+		const message = this.getValidationMessage( value );
+
+		// If there is a validation message, show it after
+		// a delay so as to give the user chance to finish typing.
+		if ( message ) {
+			this.debouncedSetValidationMessage( message );
+		} else {
+			// If the input is good, feedback immediately
+			this.debouncedSetValidationMessage.cancel();
+			this.setValidationMessage( '' );
+		}
+	}
+
+	setValidationMessage = message => {
+		this.props.setValidationMessage( message );
 	};
 
 	debouncedSetValidationMessage = debounce( this.setValidationMessage, VALIDATION_INTERVAL );
 
 	renderContent = () => {
 		const { isInputDisabled, urlInputValidationMessage, urlInputValue, translate } = this.props;
+		const canContinue = urlInputValue && ! urlInputValidationMessage;
 
 		return (
 			<div className="import-url__wrapper">
-				<FormTextInputWithAction
+				<FormTextInput
 					placeholder="Enter the URL of your existing site"
 					action="Continue"
-					onAction={ this.handleAction }
 					label={ translate( 'URL' ) }
 					onChange={ this.handleInputChange }
 					disabled={ isInputDisabled }
 					value={ urlInputValue }
+					isError={ urlInputValidationMessage }
 				/>
 				{ urlInputValidationMessage && (
 					<FormInputValidation text={ urlInputValidationMessage } isError />
 				) }
 				<ButtonGroup>
+					<Button onClick={ this.handleAction } primary disabled={ ! canContinue }>
+						{ translate( 'Continue' ) }
+					</Button>
 					<Button>Skip</Button>
 				</ButtonGroup>
 			</div>
