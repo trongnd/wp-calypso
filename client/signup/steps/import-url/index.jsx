@@ -16,17 +16,18 @@ import ButtonGroup from 'components/button-group';
 import StepWrapper from 'signup/step-wrapper';
 import SignupActions from 'lib/signup/actions';
 import FormTextInputWithAction from 'components/forms/form-text-input-with-action';
-//import FormInputValidation from 'components/forms/form-input-validation';
-import { fetchIsSiteImportable, setNuxUrlInputValue } from 'state/importer-nux/actions';
+import FormInputValidation from 'components/forms/form-input-validation';
+import { setNuxUrlInputValue, setValidationMessage } from 'state/importer-nux/actions';
 import {
 	getNuxUrlInputValue,
 	getSiteDetails,
+	getUrlInputValidationMessage,
 	isUrlInputDisabled,
 } from 'state/importer-nux/temp-selectors';
 
 const debug = debugFactory( 'calypso:signup-step-import-url' );
 
-const DEBOUNCE_CHECK_INTERVAL = 1200;
+const VALIDATION_INTERVAL = 1200;
 
 const normalizeUrlForImportSource = url => {
 	// @TODO sanitize? Prepend https:// ..?
@@ -39,8 +40,18 @@ class ImportURLStepComponent extends Component {
 		const urlFromQueryArg = normalizeUrlForImportSource( get( queryObject, 'url' ) );
 
 		if ( urlFromQueryArg ) {
-			this.fetchIsSiteImportable( urlFromQueryArg );
+			this.setValidationMessage( urlFromQueryArg );
 		}
+	}
+
+	getValidationMessage() {
+		const { urlInputValue, translate } = this.props;
+
+		if ( ! urlInputValue.match( /^([a-z0-9-_]{1,63}\.)*[a-z0-9-]{1,63}\.[a-z]{2,63}$/i ) ) {
+			return translate( 'Please enter a valid URL.' );
+		}
+
+		return '';
 	}
 
 	handleAction = importUrl => {
@@ -57,18 +68,18 @@ class ImportURLStepComponent extends Component {
 
 	handleInputChange = value => {
 		this.props.setNuxUrlInputValue( value );
-		this.debouncedFetchIsSiteImportable( normalizeUrlForImportSource( value ) );
+		this.debouncedSetValidationMessage( value );
 	};
 
-	fetchIsSiteImportable = () => {
-		const normalizedUrl = normalizeUrlForImportSource( this.props.urlInputValue );
-		this.props.fetchIsSiteImportable( normalizedUrl );
+	setValidationMessage = () => {
+		const validationMessage = this.getValidationMessage( this.props.urlInputValue );
+		this.props.setValidationMessage( validationMessage );
 	};
 
-	debouncedFetchIsSiteImportable = debounce( this.fetchIsSiteImportable, DEBOUNCE_CHECK_INTERVAL );
+	debouncedSetValidationMessage = debounce( this.setValidationMessage, VALIDATION_INTERVAL );
 
 	renderContent = () => {
-		const { isInputDisabled, urlInputValue, translate } = this.props;
+		const { isInputDisabled, urlInputValidationMessage, urlInputValue, translate } = this.props;
 
 		return (
 			<div className="import-url__wrapper">
@@ -81,7 +92,9 @@ class ImportURLStepComponent extends Component {
 					disabled={ isInputDisabled }
 					value={ urlInputValue }
 				/>
-				{ /* <FormInputValidation text="..." /> */ }
+				{ urlInputValidationMessage && (
+					<FormInputValidation text={ urlInputValidationMessage } isError />
+				) }
 				<ButtonGroup>
 					<Button>Skip</Button>
 				</ButtonGroup>
@@ -114,10 +127,11 @@ export default flow(
 			urlInputValue: getNuxUrlInputValue( state ),
 			siteDetails: getSiteDetails( state ),
 			isInputDisabled: isUrlInputDisabled( state ),
+			urlInputValidationMessage: getUrlInputValidationMessage( state ),
 		} ),
 		{
-			fetchIsSiteImportable,
 			setNuxUrlInputValue,
+			setValidationMessage,
 		}
 	),
 	localize
