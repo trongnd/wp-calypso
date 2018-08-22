@@ -18,6 +18,7 @@ import Rating from 'components/rating';
 import analytics from 'lib/analytics';
 import { getSelectedSiteId } from 'state/ui/selectors';
 import { isJetpackSite } from 'state/sites/selectors';
+import './style.scss';
 
 const PREINSTALLED_PLUGINS = [ 'Jetpack by WordPress.com', 'Akismet', 'VaultPress' ];
 

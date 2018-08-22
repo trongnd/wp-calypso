@@ -10,6 +10,7 @@ import Gridicon from 'gridicons';
  * Internal dependencies
  */
 import Button from 'components/button';
+import './style.scss';
 
 const HeaderButton = ( { icon, label, ...rest } ) => (
 	<Button className="header-button" { ...rest }>

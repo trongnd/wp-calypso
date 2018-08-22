@@ -6,6 +6,11 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 export default class Button extends PureComponent {
 	static propTypes = {
 		compact: PropTypes.bool,
