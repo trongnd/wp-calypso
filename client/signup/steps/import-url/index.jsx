@@ -5,8 +5,10 @@
 import React, { Component } from 'react';
 import { localize } from 'i18n-calypso';
 import { connect } from 'react-redux';
-import { debounce, defer, flow, get } from 'lodash';
+import { debounce, defer, flow, get, indexOf } from 'lodash';
 import debugFactory from 'debug';
+import { isWebUri } from 'valid-url';
+import { parse as parseURL } from 'url';
 
 /**
  * Internal dependencies
@@ -34,8 +36,13 @@ const normalizeUrlForImportSource = url => {
 	return url;
 };
 
-const isValidUrl = ( value = '' ) =>
-	value.match( /^([a-z0-9-_]{1,63}\.)*[a-z0-9-]{1,63}\.[a-z]{2,63}$/i );
+const isValidUrl = ( value = '' ) => {
+	const { protocol } = parseURL( value );
+	const withProtocol = protocol ? value : 'http://' + value;
+	const { hostname } = parseURL( withProtocol );
+
+	return isWebUri( withProtocol ) && indexOf( hostname, '.' ) > 0;
+};
 
 class ImportURLStepComponent extends Component {
 	componentDidMount() {
@@ -104,7 +111,7 @@ class ImportURLStepComponent extends Component {
 					onChange={ this.handleInputChange }
 					disabled={ isInputDisabled }
 					value={ urlInputValue }
-					isError={ urlInputValidationMessage }
+					isError={ !! urlInputValidationMessage }
 				/>
 				{ urlInputValidationMessage && (
 					<FormInputValidation text={ urlInputValidationMessage } isError />
