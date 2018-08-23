@@ -57,6 +57,8 @@ class Document extends React.Component {
 			inlineScriptNonce,
 		} = this.props;
 
+		const csskey = isRTL ? 'css.rtl' : 'css.ltr';
+
 		const inlineScript =
 			`COMMIT_SHA = ${ jsonStringifyForHtml( commitSha ) };\n` +
 			( user ? `var currentUser = ${ jsonStringifyForHtml( user ) };\n` : '' ) +
@@ -88,10 +90,10 @@ class Document extends React.Component {
 						}
 						type="text/css"
 					/>
-					{ entrypoint.css.map( asset => (
+					{ entrypoint[ csskey ].map( asset => (
 						<link key={ asset } rel="stylesheet" href={ asset } type="text/css" />
 					) ) }
-					{ chunkFiles.css.map( asset => (
+					{ chunkFiles[ csskey ].map( asset => (
 						<link key={ asset } rel="stylesheet" href={ asset } type="text/css" />
 					) ) }
 					{ sectionCss && (

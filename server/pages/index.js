@@ -11,14 +11,15 @@ import { execSync } from 'child_process';
 import cookieParser from 'cookie-parser';
 import debugFactory from 'debug';
 import {
+	defaults,
 	endsWith,
 	get,
 	includes,
 	pick,
 	flatten,
 	forEach,
+	groupBy,
 	intersection,
-	partition,
 	snakeCase,
 	split,
 } from 'lodash';
@@ -91,10 +92,20 @@ const getAssets = ( () => {
 	};
 } )();
 
-const groupAssetsByType = assets => {
-	const [ css, js ] = partition( assets, file => /\.css$/.test( file ) );
-	return { css, js };
+const EMPTY_ASSETS = { js: [], 'css.ltr': [], 'css.rtl': [] };
+
+const getAssetType = asset => {
+	if ( asset.endsWith( '.rtl.css' ) ) {
+		return 'css.rtl';
+	}
+	if ( asset.endsWith( '.css' ) ) {
+		return 'css.ltr';
+	}
+
+	return 'js';
 };
+
+const groupAssetsByType = assets => defaults( groupBy( assets, getAssetType ), EMPTY_ASSETS );
 
 const getFilesForChunk = chunkName => {
 	const assets = getAssets();
@@ -652,7 +663,7 @@ module.exports = function() {
 					if ( config.isEnabled( 'code-splitting' ) ) {
 						req.context.chunkFiles = getFilesForChunk( section.name );
 					} else {
-						req.context.chunkFiles = { css: [], js: [] };
+						req.context.chunkFiles = EMPTY_ASSETS;
 					}
 
 					if ( section.secondary && req.context ) {
