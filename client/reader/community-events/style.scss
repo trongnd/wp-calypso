@@ -1,0 +1,7 @@
+.is-reader-page .community-events.main {
+	max-width: 800px;
+
+	@include breakpoint( ">660px" ) {
+		margin: 30px auto;
+	}
+}
