@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import { localize } from 'i18n-calypso';
+// import { requestCommunityEvents } from 'state/data-getters';
 
 /**
  * Internal dependencies
@@ -13,6 +14,11 @@ import MobileBackToSidebar from 'components/mobile-back-to-sidebar';
 import ReaderMain from 'components/reader-main';
 
 class CommunityEvents extends React.Component {
+	constructor( props ) {
+		super( props );
+		// TODO - add a call to fetch the data
+	}
+
 	render() {
 		const { translate } = this.props;
 		return (
