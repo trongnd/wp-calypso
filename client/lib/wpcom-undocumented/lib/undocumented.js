@@ -795,6 +795,17 @@ Undocumented.prototype.getSitePlans = function( siteDomain, fn ) {
 	);
 };
 
+Undocumented.prototype.getCommunityEvents = function( query = {}, fn ) {
+	debug( 'GET: /community-events', query );
+
+	const params = {
+		...query,
+		apiNamespace: 'wpcom/v2',
+	};
+
+	return this.wpcom.req.get( '/community-events', params, fn );
+};
+
 /**
  * Get cart.
  *
