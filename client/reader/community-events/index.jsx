@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { localize } from 'i18n-calypso';
-// import { requestCommunityEvents } from 'state/data-getters';
+import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
@@ -12,11 +12,13 @@ import { localize } from 'i18n-calypso';
 import DocumentHead from 'components/data/document-head';
 import MobileBackToSidebar from 'components/mobile-back-to-sidebar';
 import ReaderMain from 'components/reader-main';
+import { requestCommunityEvents } from 'state/community-events/actions';
 
 class CommunityEvents extends React.Component {
 	constructor( props ) {
 		super( props );
-		// TODO - add a call to fetch the data
+		// TODO - maybe add item for this section in Reader to wordpress-com.js
+		this.props.requestCommunityEvents();
 	}
 
 	render() {
@@ -33,4 +35,9 @@ class CommunityEvents extends React.Component {
 	}
 }
 
-export default localize( CommunityEvents );
+export default connect(
+	null,
+	{
+		requestCommunityEvents,
+	}
+)( localize( CommunityEvents ) );
