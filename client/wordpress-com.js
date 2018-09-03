@@ -388,15 +388,6 @@ sections.push( {
 } );
 
 sections.push( {
-	name: 'reader',
-	paths: [ '/read/community-events' ],
-	module: 'reader/community-events',
-	secondary: true,
-	group: 'reader',
-	enableLoggedOut: true,
-} );
-
-sections.push( {
 	name: 'help',
 	paths: [ '/help' ],
 	module: 'me/help',
