@@ -7,6 +7,7 @@ import React from 'react';
 import { findLast } from 'lodash';
 import { localize } from 'i18n-calypso';
 import { connect } from 'react-redux';
+import Gridicon from 'gridicons';
 
 /**
  * WordPress dependencies
@@ -14,10 +15,6 @@ import { connect } from 'react-redux';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	Inserter,
@@ -32,7 +29,6 @@ import {
  * Internal dependencies
  */
 import Button from 'components/button';
-import Drafts from 'layout/masterbar/drafts';
 import Site from 'blocks/site';
 import { addSiteFragment } from 'lib/route';
 import { recordTracksEvent, withAnalytics } from 'state/analytics/actions';
@@ -41,28 +37,21 @@ import { getSelectedSite } from 'state/ui/selectors';
 import { getRouteHistory } from 'state/ui/action-log/selectors';
 
 /* eslint-disable wpcalypso/jsx-classname-namespace */
-function HeaderToolbar( {
-	closeEditor,
-	hasFixedToolbar,
-	isLargeViewport,
-	recordSiteButtonClick,
-	site,
-	translate,
-} ) {
+function HeaderToolbar( { closeEditor, hasFixedToolbar, isLargeViewport, site, translate } ) {
 	const onCloseButtonClick = () => closeEditor();
 
 	return (
 		<NavigableToolbar className="edit-post-header-toolbar" aria-label={ __( 'Editor Toolbar' ) }>
 			<Button
+				aria-label={ translate( 'Close' ) }
 				borderless
 				className="edit-post-header-toolbar__back"
+				href
 				onClick={ onCloseButtonClick }
-				aria-label={ translate( 'Close' ) }
 			>
-				{ translate( 'Close' ) }
+				<Gridicon icon="arrow-left" />
+				<Site compact site={ site } indicator={ false } onSelect={ onCloseButtonClick } />
 			</Button>
-			<Site compact site={ site } indicator={ false } onSelect={ recordSiteButtonClick } />
-			<Drafts />
 			<Inserter position="bottom right" />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
@@ -125,8 +114,6 @@ const mapDispatchToProps = dispatch => {
 					navigate( getCloseButtonPath( routeHistory, site ) )
 				)
 			),
-		recordSiteButtonClick: () =>
-			dispatch( recordTracksEvent( 'calypso_gutenberg_editor_site_button_click' ) ),
 	};
 };
 

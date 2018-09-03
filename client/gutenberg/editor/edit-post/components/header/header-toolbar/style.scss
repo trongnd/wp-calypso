@@ -78,20 +78,21 @@
 }
 
 .edit-post-header-toolbar__back.is-borderless {
+	align-items: center;
 	border-right: 1px solid lighten( $gray, 25% );
 	border-radius: 0;
 	color: $blue-wordpress;
+	display: inline-flex;
 	height: 100%;
-	min-width: 80px;
+	margin-right: 8px;
 	padding: 6px 16px;
+
 	&:hover {
 		color: $blue-medium;
 	}
-	@include breakpoint( '>960px' ) {
-		padding: 6px 32px;
-	}
-	@include breakpoint( '<660px' ) {
-		border: none;
+	.gridicon {
+		margin: 0;
+		top: 0;
 	}
 }
 
