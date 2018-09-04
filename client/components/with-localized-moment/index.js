@@ -13,8 +13,23 @@ import moment from 'moment';
  */
 import getCurrentLocaleSlug from 'state/selectors/get-current-locale-slug';
 
+const momentLoaders = new Map();
+
 function loadMomentLocale( locale ) {
-	return import( /* webpackChunkName: "moment-locale-[request]", webpackInclude: /\.js$/ */ `moment/locale/${ locale }` );
+	const existingLoader = momentLoaders.get( locale );
+	if ( existingLoader ) {
+		return existingLoader;
+	}
+
+	const newLoader = import( /* webpackChunkName: "moment-locale-[request]", webpackInclude: /\.js$/ */ `moment/locale/${ locale }` )
+		.then( () => {
+			moment.locale( locale );
+		} )
+		.finally( () => {
+			momentLoaders.delete( locale );
+		} );
+	momentLoaders.set( locale, newLoader );
+	return newLoader;
 }
 
 function getDisplayName( WrappedComponent ) {
@@ -25,25 +40,20 @@ export default function( WrappedComponent ) {
 	class WithLocalizedMoment extends Component {
 		static displayName = `WithLocalizedMoment(${ getDisplayName( WrappedComponent ) })`;
 
-		state = {
-			momentLocale: null,
-		};
-
 		loadLocale() {
-			if ( this.props.locale === this.state.momentLocale ) {
+			if ( this.props.locale === moment.locale() ) {
 				return;
 			}
 			if ( this.props.locale !== 'en' ) {
 				const loadingLocale = this.props.locale;
 				loadMomentLocale( loadingLocale ).then( () => {
 					if ( this._mounted && this.props.locale === loadingLocale ) {
-						moment.locale( loadingLocale );
-						this.setState( { momentLocale: this.props.locale } );
+						this.forceUpdate();
 					}
 				} );
 			} else {
 				moment.locale( 'en' );
-				this.setState( { momentLocale: 'en' } );
+				this.forceUpdate();
 			}
 		}
 
@@ -61,13 +71,7 @@ export default function( WrappedComponent ) {
 		}
 
 		render() {
-			return (
-				<WrappedComponent
-					moment={ moment }
-					momentLocale={ this.state.momentLocale }
-					{ ...this.props }
-				/>
-			);
+			return <WrappedComponent moment={ moment } { ...this.props } />;
 		}
 	}
 

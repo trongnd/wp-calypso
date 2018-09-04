@@ -20,7 +20,7 @@ class FormattedDateExample extends PureComponent {
 
 	state = {
 		currentDate: new Date(),
-		currentDateString: (new Date()).toISOString(),
+		currentDateString: new Date().toISOString(),
 		format: 'lll',
 	};
 
@@ -29,14 +29,14 @@ class FormattedDateExample extends PureComponent {
 		if ( val.isValid() ) {
 			this.setState( {
 				currentDate: val.toDate(),
-				currentDateString: evt.target.value
+				currentDateString: evt.target.value,
 			} );
 		}
 	};
 
 	handleLocaleChange = evt => {
 		const val = evt.target.value;
-		if ( val.length === 2 || val.length === 4 ) {
+		if ( val.length === 2 || val.length === 5 ) {
 			this.props.setLocale( evt.target.value );
 		}
 	};
