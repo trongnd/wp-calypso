@@ -1,7 +1,65 @@
-.is-reader-page .community-events.main {
+.community-events.main {
 	max-width: 800px;
 
-	@include breakpoint( ">660px" ) {
+	&.is-loading {
+
+	}
+
+	@include breakpoint('>660px') {
 		margin: 30px auto;
 	}
+}
+
+.community-events__events {
+	.card {
+		margin: 16px 0;
+	}
+	.card-heading {
+		margin-top: 0;
+	}
+}
+
+.community-events__event-placeholder {
+	pointer-events: none;
+	user-select: none;
+
+	.card-heading,
+	.community-events__event-meetup,
+	.community-events__event-date,
+	.community-events__event-location,
+	.community-events__event-link {
+		color: transparent;
+		background-color: $gray-lighten-30;
+		animation: loading-fade 1.6s ease-in-out infinite;
+	}
+
+	.community-events__event-date {
+		max-width: 40%;
+	}
+
+	.community-events__event-location {
+		margin-right: 2em;
+	}
+}
+
+.community-events__event {
+	display: flex;
+}
+
+.community-events__event-details {
+	flex: 0 1 80%;
+}
+
+.community-events__event-date {
+	color: $gray-text-min;
+}
+
+.community-events__event-link {
+	flex: 0 0 20%;
+	align-self: flex-end;
+	text-align: right;
+}
+
+.community-events__sorry {
+	text-align: center;
 }

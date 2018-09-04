@@ -13,7 +13,6 @@ import {
 	COMMUNITY_EVENTS_RECEIVE,
 	COMMUNITY_EVENTS_REQUEST,
 	COMMUNITY_EVENTS_REQUEST_FAILURE,
-	// COMMUNITY_EVENTS_REQUEST_SUCCESS,
 } from 'state/action-types';
 import wpcom from 'lib/wp';
 
