@@ -25,6 +25,8 @@ import moment from 'moment';
 /**
  * Internal dependencies
  */
+import { getPlan } from 'lib/plans';
+import { PLAN_FREE, PLAN_JETPACK_FREE } from 'lib/plans/constants';
 import config from 'config';
 import { isHttps, withoutHttp, addQueryArgs, urlToSlug } from 'lib/url';
 
@@ -583,22 +585,9 @@ export function getSitePlan( state, siteId ) {
 
 	if ( get( site.plan, 'expired', false ) ) {
 		if ( site.jetpack ) {
-			return {
-				product_id: 2002,
-				product_slug: 'jetpack_free',
-				product_name_short: 'Free',
-				free_trial: false,
-				expired: false,
-			};
+			return getPlan( PLAN_JETPACK_FREE );
 		}
-
-		return {
-			product_id: 1,
-			product_slug: 'free_plan',
-			product_name_short: 'Free',
-			free_trial: false,
-			expired: false,
-		};
+		return getPlan( PLAN_FREE );
 	}
 
 	return site.plan;
